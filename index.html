@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Scheduling Algorithm</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+    <h1>Probabilistic Fair CPU Scheduling</h1>
+    <br>
+    <div class="container">
+        <div class="form-container">
+            <h2>Input:</h2>
+            <form>
+                <label>Arrival Time:</label>
+                <input type="text" id="arrival-time" placeholder="eg. 0,1,2" required>
+                <label>Burst Time:</label>
+                <input type="text" id="burst-time" placeholder="eg. 0,1,2" required>
+                <label>Priority:</label>
+                <input type="text" id="priority" placeholder="eg. 0,1,2" required>
+                <button type="button" onclick="submitData()">Submit</button>
+            </form>
+        </div>
+
+        <div class="output-container">
+            <h2>Output:</h2>
+            <div id="gantt-chart"></div>
+            <div id="output"></div>
+        </div>
+    </div>
+    <script>
+
+        function calculateProbability(priority, totalPriority, n, k) {
+            let probability = (priority + k) / (totalPriority + (n * k));
+            return probability;
+        }
+
+        function selectProcess(mpp, processes, n, k) {
+
+            //print processes
+            console.log("Processes: ");
+            for (let i = 0; i < n; i++) {
+                console.log(processes[i][0] + " " + processes[i][1] + " " + processes[i][2]);
+            }
+            let probabilityVector = [];
+
+            let totalPriority = 0;
+            for (let i = 0; i < Object.keys(mpp).length; i++) {
+                if (mpp[i] == true) {
+                    totalPriority += processes[i][2];
+                }
+            }
+
+            if (totalPriority == 0) {
+                return -1;
+            }
+
+            for (let j = 0; j < Object.keys(mpp).length; j++) {
+                if (mpp[j] == true) {
+                    probabilityVector.push([j, calculateProbability(processes[j][2], totalPriority, n, k)]);
+                }
+            }
+
+            let r = Math.random(); // Random value between 0 and 1
+            let sum = 0.0;
+
+            for (let i = 0; i < probabilityVector.length; i++) {
+                sum += probabilityVector[i][1];
+            }
+
+            for (let i = 0; i < n; i++) {
+                sum -= probabilityVector[i][1];
+                if (r > sum) {
+                    return probabilityVector[i][0];
+                }
+            }
+
+            return probabilityVector[n - 1][0]; // Fallback option
+        }
+
+        function probabilisticFair(processes, n, time_quantum) {
+
+            let p = [];
+            let arrivalTime = [];
+            let burstTime = [];
+            let burstTimeFinal = [];
+            let completionTime = [];
+            let priority = [];
+
+            let avgWaitingTime = 0;
+            let avgTurnaaroundTime = 0;
+
+            let min = 100000;
+            let ix = -1;
+
+            let mpp = new Map();
+
+            for (let i = 0; i < n; i++) {
+                p[i] = i;
+                arrivalTime[i] = processes[i][0];
+                burstTime[i] = processes[i][1];
+                priority[i] = processes[i][2];
+                burstTimeFinal[i] = burstTime[i];
+                mpp.set(p[i], false);
+
+                if (min > arrivalTime[i]) {
+                    min = arrivalTime[i];
+                    ix = i;
+                }
+            }
+
+            let ans = min;
+            let ii = 0;
+            let jj = 0;
+            let processesInQueue = 0;
+
+            for (let i = 0; i < n; i++) {
+                if (arrivalTime[i] == min) {
+                    mpp.set(p[i], true);
+                    processesInQueue++;
+                }
+            }
+
+            let ganttChart = "";
+
+            let processRunning = selectProcess(mpp, processes, processesInQueue, 2);
+
+            console.log("\nGantt Chart:\n\n");
+
+            for (let j = 0; j < n;) {
+
+                console.log(ans + "---P" + p[processRunning] + "---");
+
+                let o = burstTime[processRunning];
+
+                if (o > time_quantum) {
+                    ans += time_quantum;
+                    burstTime[processRunning] -= time_quantum;
+
+                    for (let i = 0; i < n; i++) {
+                        if (mpp.get(p[i]) == false && arrivalTime[i] <= ans && burstTime[i] > 0) {
+                            mpp.set(p[i], true);
+                            processesInQueue++;
+                        }
+                    }
+
+                    jj += 9;
+                }
+
+                else {
+                    ans += o;
+                    burstTime[processRunning] -= o;
+
+                    for (let i = 0; i < n; i++) {
+                        if (mpp.get(p[i]) == false && arrivalTime[i] <= ans && burstTime[i] > 0) {
+                            mpp.set(p[i], true);
+                            processesInQueue++;
+                        }
+                    }
+
+                    completionTime[processRunning] = ans;
+                    mpp.set(p[processRunning], false);
+                    processesInQueue--;
+                    j++;
+                    jj += 9;
+                }
+
+                processRunning = selectProcess(mpp, processes, processesInQueue, 2);
+
+                if (processRunning == -1 && j < n) {
+                    let min = Number.MAX_SAFE_INTEGER;
+                    let ix = -1;
+
+                    for (let i = 0; i < n; i++) {
+                        if (mpp.get(p[i]) == false && arrivalTime[i] < min && arrivalTime[i] > ans) {
+                            min = arrivalTime[i];
+                            ix = i;
+                        }
+                    }
+
+                    for (let i = 0; i < n; i++) {
+                        if (arrivalTime[i] == min) {
+                            mpp.set(p[i], true);
+                            processesInQueue++;
+                        }
+                    }
+
+                    console.log(ans);
+
+                    ans = min;
+
+                    processRunning = selectProcess(mpp, processes, processesInQueue, 2);
+                }
+            }
+
+            console.log(ans);
+
+            // console.log("\n\nProcess ID\t| Priority\t| Arrival Time\t| Burst Time\t| Completion Time\t| Turnaround Time\t| Waiting Time");
+
+
+            // for (let i = 0; i < n; i++) {
+            //     let turnaroundTime = completionTime[i] - arrivalTime[i];
+            //     let waitingTime = turnaroundTime - burstTimeFinal[i];
+            //     avgTurnaaroundTime += turnaroundTime;
+            //     avgWaitingTime += waitingTime;
+            //     console.log("--------------------------------------------------------------------------------------------------------------------------------");
+            //     console.log(`P${p[i]}\t\t| ${priority[i]}\t\t| ${arrivalTime[i]}\t\t| ${burstTimeFinal[i]}\t\t| ${completionTime[i]}\t\t\t| ${turnaroundTime}\t\t\t| ${waitingTime}`);
+            // }
+
+            // console.log("--------------------------------------------------------------------------------------------------------------------------------");
+            // console.log(`Average Turnaround Time: ${(avgTurnaaroundTime / n).toFixed(2)}`);
+            // console.log(`Average Waiting Time: ${(avgWaitingTime / n).toFixed(2)}`);
+        
+        }
+
+            function submitData() {
+                var arrivalTime = document.getElementById("arrival-time").value;
+                var burstTime = document.getElementById("burst-time").value;
+                var priority = document.getElementById("priority").value;
+                var arrivalTimeArray = arrivalTime.split(",");
+                var burstTimeArray = burstTime.split(",");
+                var priorityArray = priority.split(",");
+
+                //make a 2d array, each row is a process, with arrival time, burst time, priority
+
+                var processes = [];
+                for (var i = 0; i < arrivalTimeArray.length; i++) {
+                    processes.push([parseInt(arrivalTimeArray[i]), parseInt(burstTimeArray[i]), parseInt(priorityArray[i])]);
+                }
+
+                var time_quantum = 2;
+
+                probabilisticFair(processes, processes.length, time_quantum);
+
+            }
+    </script>
+</body>
+
+</html>
