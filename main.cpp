@@ -192,7 +192,7 @@ void probabilisticFair(int processes[][3], int n, int time_quantum){
 
 int main(){
 
-    int arr[][3] = {{0, 5, 3}, {1, 3, 1}, {2, 6, 4}, {3, 4, 2}};
+    int arr[][3] = {{0, 5, 3}, {1, 3, 1}, {2, 6, 4}, {3, 4, 2}, };
     int n = sizeof(arr)/sizeof(arr[0]);
     int time_quantum = 2;
 

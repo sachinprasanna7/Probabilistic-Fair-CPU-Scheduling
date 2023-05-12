@@ -168,6 +168,13 @@
                 //ganttChart += "<div class='gantt-chart-element' style='width: 20px;'>" + "P" + p[processRunning] + "</div>";
                 ganttChart += "<div class='gantt-chart-element'>" + ans + "---P" + p[processRunning] + "---" + "</div>";
 
+                // ganttChart += "<div class='gantt-chart-element'>"
+                //     + "<div class='gantt-chart-time'>" + ans + "</div>" // start time
+                //     + "<div class='gantt-chart-box'>P" + p[processRunning] + "</div>" // process name in box
+                //     + "<div class='gantt-chart-time'>" + "---" + "</div>" // separator
+                //     + "</div>";
+
+
                 let o = burstTime[processRunning];
 
                 if (o > time_quantum) {
@@ -285,27 +292,27 @@
             // avgWaitingTimeRow.innerHTML = `<td colspan="5"></td><td></td><td>${avgWaitingTimeText.textContent}</td>`;
             // tableBody.appendChild(avgWaitingTimeRow);
 
-                // Your existing code for generating result
-                // ...
+            // Your existing code for generating result
+            // ...
 
-                // Access the table and its body
-                const table = document.getElementById("table");
-                const tableBody = table.querySelector("tbody");
+            // Access the table and its body
+            const table = document.getElementById("table");
+            const tableBody = table.querySelector("tbody");
 
-                // Remove the existing rows (if any)
-                while (tableBody.firstChild) {
-                    tableBody.removeChild(tableBody.firstChild);
-                }
+            // Remove the existing rows (if any)
+            while (tableBody.firstChild) {
+                tableBody.removeChild(tableBody.firstChild);
+            }
 
-                // Generate new rows and append them to the table body
-                for (let i = 0; i < n; i++) {
-                    let turnaroundTime = completionTime[i] - arrivalTime[i];
-                    let waitingTime = turnaroundTime - burstTimeFinal[i];
-                    avgTurnaaroundTime += turnaroundTime;
-                    avgWaitingTime += waitingTime;
+            // Generate new rows and append them to the table body
+            for (let i = 0; i < n; i++) {
+                let turnaroundTime = completionTime[i] - arrivalTime[i];
+                let waitingTime = turnaroundTime - burstTimeFinal[i];
+                avgTurnaaroundTime += turnaroundTime;
+                avgWaitingTime += waitingTime;
 
-                    let row = tableBody.insertRow();
-                    row.innerHTML = `
+                let row = tableBody.insertRow();
+                row.innerHTML = `
       <td>P${p[i]}</td>
       <td>${priority[i]}</td>
       <td>${arrivalTime[i]}</td>
@@ -314,14 +321,14 @@
       <td>${turnaroundTime}</td>
       <td>${waitingTime}</td>
     `;
-                }
-
-                // Update the average turnaround time and average waiting time
-                const avgTurnaroundTimeElem = document.getElementById("avgTurnaroundTime");
-                const avgWaitingTimeElem = document.getElementById("avgWaitingTime");
-                avgTurnaroundTimeElem.textContent = (avgTurnaaroundTime / n).toFixed(2);
-                avgWaitingTimeElem.textContent = (avgWaitingTime / n).toFixed(2);
             }
+
+            // Update the average turnaround time and average waiting time
+            const avgTurnaroundTimeElem = document.getElementById("avgTurnaroundTime");
+            const avgWaitingTimeElem = document.getElementById("avgWaitingTime");
+            avgTurnaroundTimeElem.textContent = (avgTurnaaroundTime / n).toFixed(2);
+            avgWaitingTimeElem.textContent = (avgWaitingTime / n).toFixed(2);
+        }
 
 
         function submitData() {
@@ -349,7 +356,7 @@
                 alert("Please enter the same number of values for each field.");
                 return;
             }
-            
+
             //if the user entered a negative value, alert the user
             for (var i = 0; i < arrivalTimeArray.length; i++) {
                 if (arrivalTimeArray[i] < 0 || burstTimeArray[i] <= 0 || priorityArray[i] <= 0) {
@@ -358,7 +365,7 @@
                 }
             }
 
-            timeQuantum= parseInt(timeQuantum);
+            timeQuantum = parseInt(timeQuantum);
 
             //if time quantum is 0 or negative
             if (timeQuantum <= 0) {

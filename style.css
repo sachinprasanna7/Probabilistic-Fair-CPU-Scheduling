@@ -117,6 +117,19 @@ tr:nth-child(even) {
     text-align: center;
 }
 
+.gantt-chart-time {
+    text-align: center;
+    font-size: smaller;
+  }
+  
+  .gantt-chart-box {
+    display: inline-block;
+    border: 1px solid black;
+    padding: 2px;
+    margin: 2px;
+  }
+  
+
 #output{
     margin-top: 50px;
 }
