@@ -95,10 +95,10 @@ void probabilisticFair(int processes[][3], int n, int time_quantum){
     }
 
     char ganttChart[10000];
+    
+    cout<<"\nGantt Chart:\n\n";
 
     int processRunning = selectProcess(mpp, processes, processesInQueue, 2);
-
-    cout<<"\nGantt Chart:\n\n";
 
     for(int j = 0; j < n;){
 
@@ -192,13 +192,15 @@ void probabilisticFair(int processes[][3], int n, int time_quantum){
 
 int main(){
 
-    int arr[][3] = {{0, 1, 3}, {1, 2, 6}, {2, 3, 7}, {3, 7, 2}, {4, 8, 8}, {5, 9, 9}, {6, 14, 5}, {7, 15, 4}, {8, 16, 1}};
+    int arr[][3] = {{0, 5, 3}, {1, 3, 1}, {2, 6, 4}, {3, 4, 2}};
     int n = sizeof(arr)/sizeof(arr[0]);
     int time_quantum = 2;
 
-    for(int i = 0 ; i < 10 ; i++){
-        probabilisticFair(arr, n, time_quantum);
-        cout<<endl;
-    }
+    // for(int i = 0 ; i < 10 ; i++){
+    //     probabilisticFair(arr, n, time_quantum);
+    //     cout<<endl;
+    // }
+
+    probabilisticFair(arr, n, time_quantum);
 
 }

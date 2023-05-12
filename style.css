@@ -26,6 +26,7 @@ form {
 
   .output-container {
     width: 60%;
+    position: relative;
   }
   
   /* .form-container form {
@@ -88,10 +89,11 @@ th,
 td {
     padding: 10px;
     text-align: center;
+    width: 10%;
 }
 
 th {
-    background-color: #4CAF50;
+    background-color: #0077cc;
     color: white;
 }
 
@@ -100,10 +102,23 @@ tr:nth-child(even) {
 }
 
 #gantt-chart {
-    display: flex;
+    /* display: flex;
     justify-content: center;
     margin-top: 20px;
-    height: 50px;
+    height: 50px; */
+    display: inline-block;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.gantt-chart-element{
+    display: inline;
+    text-align: center;
+}
+
+#output{
+    margin-top: 50px;
 }
 
 .task {

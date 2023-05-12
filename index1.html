@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Scheduling Algorithm</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+    <h1 style="margin: 0%;">Probabilistic Fair CPU Scheduling</h1>
+    <br>
+    <div class="container">
+        <div class="form-container">
+            <h2>Input:</h2>
+            <form>
+                <label>Arrival Time:</label>
+                <input type="text" id="arrival-time" placeholder="eg. 0,1,2" required>
+                <label>Burst Time:</label>
+                <input type="text" id="burst-time" placeholder="eg. 0,1,2" required>
+                <label>Priority:</label>
+                <input type="text" id="priority" placeholder="eg. 0,1,2" required>
+                <label>Time Quantum:</label>
+                <input type="text" id="time-quantum" placeholder="eg. 2" required>
+                <!-- <label>Adjustible Parameter (k):</label>
+                <input type="text" id="k" placeholder="eg. 1" required> -->
+                <button type="button" onclick="submitData()">Submit</button>
+            </form>
+        </div>
+
+        <div class="output-container">
+            <h2>Output:</h2>
+            <div id="output">
+                <table id="table">
+                    <thead>
+                        <tr>
+                            <th>Process ID</th>
+                            <th>Priority</th>
+                            <th>Arrival Time</th>
+                            <th>Burst Time</th>
+                            <th>Completion Time</th>
+                            <th>Turnaround Time</th>
+                            <th>Waiting Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Table body will be generated dynamically by JavaScript -->
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="5"></td>
+                            <td>Average Turnaround Time: <span id="avgTurnaroundTime"></span></td>
+                            <td>Average Waiting Time: <span id="avgWaitingTime"></span></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div id="gantt-chart">
+                <!-- Gantt chart will be generated dynamically by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        submitData();
+
+        function calculateProbability(priority, totalPriority, n, k) {
+            let probability = (priority + k) / (totalPriority + (n * k));
+            return probability;
+        }
+
+        function selectProcess(mpp, processes, n, k, len) {
+            //print processes
+
+            let probabilityVector = [];
+
+            let totalPriority = 0;
+            for (let i = 0; i < len; i++) {
+                if (mpp.get(i) == true) {
+                    totalPriority += processes[i][2];
+                }
+            }
+            //console.log("totalPriority = " + totalPriority);
+            if (totalPriority == 0) {
+                return -1;
+            }
+
+            for (let j = 0; j < len; j++) {
+                if (mpp.get(j) == true) {
+                    probabilityVector.push([j, calculateProbability(processes[j][2], totalPriority, n, k)]);
+                }
+            }
+
+            let r = Math.random(); // Random value between 0 and 1
+            let sum = 0.0;
+
+            for (let i = 0; i < probabilityVector.length; i++) {
+                sum += probabilityVector[i][1];
+            }
+
+            for (let i = 0; i < n; i++) {
+                sum -= probabilityVector[i][1];
+                if (r > sum) {
+                    return probabilityVector[i][0];
+                }
+            }
+
+            return probabilityVector[n - 1][0]; // Fallback option
+        }
+
+        function probabilisticFair(processes, n, time_quantum) {
+
+            time_quantum = parseInt(time_quantum);
+
+            let p = [];
+            let arrivalTime = [];
+            let burstTime = [];
+            let burstTimeFinal = [];
+            let completionTime = [];
+            let priority = [];
+
+            let avgWaitingTime = 0;
+            let avgTurnaaroundTime = 0;
+
+            let min = 100000;
+            let ix = -1;
+
+            let mpp = new Map();
+
+            for (let i = 0; i < n; i++) {
+                p[i] = i;
+                arrivalTime[i] = processes[i][0];
+                burstTime[i] = processes[i][1];
+                priority[i] = processes[i][2];
+                burstTimeFinal[i] = burstTime[i];
+                mpp.set(p[i], false);
+
+                if (min > arrivalTime[i]) {
+                    min = arrivalTime[i];
+                    ix = i;
+                }
+            }
+
+            let ans = min;
+            let ii = 0;
+            let jj = 0;
+            let processesInQueue = 0;
+            for (let i = 0; i < n; i++) {
+                if (arrivalTime[i] == min) {
+                    mpp.set(p[i], true);
+                    processesInQueue++;
+                }
+            }
+            let ganttChart = "";
+            let processRunning = selectProcess(mpp, processes, processesInQueue, 2, n);
+            console.log("\nGantt Chart:\n\n");
+
+            //make gantt chart to display it on the webpage, what element should i use?
+
+            ganttChart += "<h2 style=\"margin-top: 110px;\">Gantt Chart:</h2>";
+
+
+
+            for (let j = 0; j < n;) {
+
+                console.log(ans + "---P" + p[processRunning] + "---");
+                //add it to gantt chart for displaying on webpage
+                //ganttChart += "<div class='gantt-chart-element' style='width: 20px;'>" + "P" + p[processRunning] + "</div>";
+                ganttChart += "<div class='gantt-chart-element'>" + ans + "---P" + p[processRunning] + "---" + "</div>";
+
+                let o = burstTime[processRunning];
+
+                if (o > time_quantum) {
+                    ans += time_quantum;
+                    burstTime[processRunning] -= time_quantum;
+
+                    for (let i = 0; i < n; i++) {
+                        if (mpp.get(p[i]) == false && arrivalTime[i] <= ans && burstTime[i] > 0) {
+                            mpp.set(p[i], true);
+                            processesInQueue++;
+                        }
+                    }
+
+                    jj += 9;
+                }
+
+                else {
+                    ans += o;
+                    burstTime[processRunning] -= o;
+
+                    for (let i = 0; i < n; i++) {
+                        if (mpp.get(p[i]) == false && arrivalTime[i] <= ans && burstTime[i] > 0) {
+                            mpp.set(p[i], true);
+                            processesInQueue++;
+                        }
+                    }
+
+                    completionTime[processRunning] = ans;
+                    mpp.set(p[processRunning], false);
+                    processesInQueue--;
+                    j++;
+                    jj += 9;
+                }
+
+                processRunning = selectProcess(mpp, processes, processesInQueue, 2, n);
+
+                if (processRunning == -1 && j < n) {
+                    let min = Number.MAX_SAFE_INTEGER;
+                    let ix = -1;
+
+                    for (let i = 0; i < n; i++) {
+                        if (mpp.get(p[i]) == false && arrivalTime[i] < min && arrivalTime[i] > ans) {
+                            min = arrivalTime[i];
+                            ix = i;
+                        }
+                    }
+
+                    for (let i = 0; i < n; i++) {
+                        if (arrivalTime[i] == min) {
+                            mpp.set(p[i], true);
+                            processesInQueue++;
+                        }
+                    }
+
+                    console.log(ans);
+
+                    ans = min;
+
+                    processRunning = selectProcess(mpp, processes, processesInQueue, 2, n);
+                }
+            }
+
+            console.log(ans);
+            //add it to gantt chart
+            ganttChart += "<div class='gantt-chart-element'>" + ans + "</div>";
+
+            //display gantt chart on webpage
+            document.getElementById("gantt-chart").innerHTML = ganttChart;
+
+
+            // console.log("\n\nProcess ID\t| Priority\t| Arrival Time\t| Burst Time\t| Completion Time\t| Turnaround Time\t| Waiting Time");
+
+
+            // for (let i = 0; i < n; i++) {
+            //     let turnaroundTime = completionTime[i] - arrivalTime[i];
+            //     let waitingTime = turnaroundTime - burstTimeFinal[i];
+            //     avgTurnaaroundTime += turnaroundTime;
+            //     avgWaitingTime += waitingTime;
+            //     console.log("--------------------------------------------------------------------------------------------------------------------------------");
+            //     console.log(`P${p[i]}\t\t| ${priority[i]}\t\t| ${arrivalTime[i]}\t\t| ${burstTimeFinal[i]}\t\t| ${completionTime[i]}\t\t\t| ${turnaroundTime}\t\t\t| ${waitingTime}`);
+            // }
+
+            // console.log("--------------------------------------------------------------------------------------------------------------------------------");
+            // console.log(`Average Turnaround Time: ${(avgTurnaaroundTime / n).toFixed(2)}`);
+            // console.log(`Average Waiting Time: ${(avgWaitingTime / n).toFixed(2)}`);
+
+            //             let tableBody = document.querySelector('#table tbody');
+            //             for (let i = 0; i < n; i++) {
+            //                 let turnaroundTime = completionTime[i] - arrivalTime[i];
+            //                 let waitingTime = turnaroundTime - burstTimeFinal[i];
+            //                 avgTurnaaroundTime += turnaroundTime;
+            //                 avgWaitingTime += waitingTime;
+
+            //                 let row = document.createElement('tr');
+            //                 row.innerHTML = `
+            //     <td>P${p[i]}</td>
+            //     <td>${priority[i]}</td>
+            //     <td>${arrivalTime[i]}</td>
+            //     <td>${burstTimeFinal[i]}</td>
+            //     <td>${completionTime[i]}</td>
+            //     <td>${turnaroundTime}</td>
+            //     <td>${waitingTime}</td>
+            //   `;
+            //                 tableBody.appendChild(row);
+            //             }
+
+            //             let avgTurnaroundTimeText = document.createTextNode(`Average Turnaround Time: ${(avgTurnaaroundTime / n).toFixed(2)}`);
+            //             let avgWaitingTimeText = document.createTextNode(`Average Waiting Time: ${(avgWaitingTime / n).toFixed(2)}`);
+
+            //             let avgTurnaroundTimeRow = document.createElement('tr');
+            //             avgTurnaroundTimeRow.innerHTML = `<td colspan="5"></td><td>${avgTurnaroundTimeText.textContent}</td><td>${avgWaitingTimeText.textContent}</td>`;
+            //             tableBody.appendChild(avgTurnaroundTimeRow);
+
+            // let avgWaitingTimeRow = document.createElement('tr');
+            // avgWaitingTimeRow.innerHTML = `<td colspan="5"></td><td></td><td>${avgWaitingTimeText.textContent}</td>`;
+            // tableBody.appendChild(avgWaitingTimeRow);
+
+                // Your existing code for generating result
+                // ...
+
+                // Access the table and its body
+                const table = document.getElementById("table");
+                const tableBody = table.querySelector("tbody");
+
+                // Remove the existing rows (if any)
+                while (tableBody.firstChild) {
+                    tableBody.removeChild(tableBody.firstChild);
+                }
+
+                // Generate new rows and append them to the table body
+                for (let i = 0; i < n; i++) {
+                    let turnaroundTime = completionTime[i] - arrivalTime[i];
+                    let waitingTime = turnaroundTime - burstTimeFinal[i];
+                    avgTurnaaroundTime += turnaroundTime;
+                    avgWaitingTime += waitingTime;
+
+                    let row = tableBody.insertRow();
+                    row.innerHTML = `
+      <td>P${p[i]}</td>
+      <td>${priority[i]}</td>
+      <td>${arrivalTime[i]}</td>
+      <td>${burstTimeFinal[i]}</td>
+      <td>${completionTime[i]}</td>
+      <td>${turnaroundTime}</td>
+      <td>${waitingTime}</td>
+    `;
+                }
+
+                // Update the average turnaround time and average waiting time
+                const avgTurnaroundTimeElem = document.getElementById("avgTurnaroundTime");
+                const avgWaitingTimeElem = document.getElementById("avgWaitingTime");
+                avgTurnaroundTimeElem.textContent = (avgTurnaaroundTime / n).toFixed(2);
+                avgWaitingTimeElem.textContent = (avgWaitingTime / n).toFixed(2);
+            }
+
+
+        function submitData() {
+            var arrivalTime = document.getElementById("arrival-time").value;
+            var burstTime = document.getElementById("burst-time").value;
+            var priority = document.getElementById("priority").value;
+            var timeQuantum = document.getElementById("time-quantum").value;
+            var arrivalTimeArray = arrivalTime.split(',');
+            var burstTimeArray = burstTime.split(',');
+            var priorityArray = priority.split(',');
+            //make a 2d array, each row is a process, with arrival time, burst time, priority
+
+            var processes = [];
+            for (var i = 0; i < arrivalTimeArray.length; i++) {
+                var single = [];
+                single.push(parseInt(arrivalTimeArray[i]));
+                single.push(parseInt(burstTimeArray[i]));
+                single.push(parseInt(priorityArray[i]));
+                processes.push(single);
+                //processes.push([parseInt(arrivalTimeArray[i]), parseInt(burstTimeArray[i]), parseInt(priorityArray[i])]);
+            }
+
+            //if the arrays are not the same length, alert the user
+            if (arrivalTimeArray.length != burstTimeArray.length || arrivalTimeArray.length != priorityArray.length) {
+                alert("Please enter the same number of values for each field.");
+                return;
+            }
+            
+            //if the user entered a negative value, alert the user
+            for (var i = 0; i < arrivalTimeArray.length; i++) {
+                if (arrivalTimeArray[i] < 0 || burstTimeArray[i] <= 0 || priorityArray[i] <= 0) {
+                    alert("Please enter positive values only for Priority and Burst Time, and non negative values for Arrival Time.");
+                    return;
+                }
+            }
+
+            timeQuantum= parseInt(timeQuantum);
+
+            //if time quantum is 0 or negative
+            if (timeQuantum <= 0) {
+                alert("Please enter a positive value for Time Quantum.");
+                return;
+            }
+
+            probabilisticFair(processes, processes.length, timeQuantum);
+
+        }
+    </script>
+</body>
+
+</html>
