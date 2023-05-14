@@ -63,8 +63,8 @@ int selectProcess(unordered_map <int,bool> &mpp, int processes[][3], int n, int 
 
 void probabilisticFair(int processes[][3], int n, int time_quantum){
 
-    int p[100], arrivalTime[100], burstTime[100], burstTimeFinal[100], completionTime[100], priority[100];
-    float avgWaitingTime = 0, avgTurnaaroundTime = 0;
+    int p[100], arrivalTime[100], burstTime[100], burstTimeFinal[100], completionTime[100], priority[100], responseTime[100];
+    float avgWaitingTime = 0, avgTurnaaroundTime = 0, avgResponseTime = 0;
 
     int min = INT_MAX, ix = -1;
 
@@ -76,6 +76,7 @@ void probabilisticFair(int processes[][3], int n, int time_quantum){
         burstTime[i] = processes[i][1];
         priority[i] = processes[i][2];
         burstTimeFinal[i] = burstTime[i];
+        responseTime[i] = -1;
         mpp[p[i]] = false;
 
         if(min > arrivalTime[i]){
@@ -99,6 +100,8 @@ void probabilisticFair(int processes[][3], int n, int time_quantum){
     cout<<"\nGantt Chart:\n\n";
 
     int processRunning = selectProcess(mpp, processes, processesInQueue, 2);
+
+    responseTime[processRunning] = ans;
 
     for(int j = 0; j < n;){
 
@@ -139,6 +142,10 @@ void probabilisticFair(int processes[][3], int n, int time_quantum){
 
         processRunning = selectProcess(mpp, processes, processesInQueue, 2);
 
+        if(responseTime[processRunning] == -1){
+            responseTime[processRunning] = ans;
+        }
+
         if(processRunning == -1 && j < n){
             //traverse through mpp and check if any process is left that arrives later than ans
             int min = INT_MAX, ix = -1;
@@ -160,7 +167,9 @@ void probabilisticFair(int processes[][3], int n, int time_quantum){
 
             ans = min;
 
-            processRunning = selectProcess(mpp, processes, processesInQueue, 2);  
+            processRunning = selectProcess(mpp, processes, processesInQueue, 2); 
+
+            responseTime[processRunning] = ans; 
         }
     }
 
@@ -172,27 +181,30 @@ void probabilisticFair(int processes[][3], int n, int time_quantum){
     //cout<<"ans: "<<ans<<endl;
 
 
-    printf("\n\nProcess ID\t| Priority\t| Arrival Time\t| Burst Time\t| Completion Time\t| Turnaround Time\t| Waiting Time");
+    printf("\n\nProcess ID\t| Priority\t| Arrival Time\t| Burst Time\t| Completion Time\t| Turnaround Time\t| Waiting Time\t| Response Time\n");
     
 
     for (int i = 0; i < n; i++){
         int turnaaroundTime = completionTime[i] - arrivalTime[i];
         int waitingTime = turnaaroundTime - burstTimeFinal[i];
+        responseTime[i] -= arrivalTime[i];
         avgTurnaaroundTime += turnaaroundTime;
         avgWaitingTime += waitingTime;
-        printf("\n--------------------------------------------------------------------------------------------------------------------------------");
-        printf("\nP%d\t\t| %d\t\t| %d\t\t| %d\t\t| %d\t\t\t| %d\t\t\t| %d", p[i], priority[i], arrivalTime[i], burstTimeFinal[i], completionTime[i], turnaaroundTime, waitingTime);
+        avgResponseTime += responseTime[i];
+        printf("\n------------------------------------------------------------------------------------------------------------------------------------------------");
+        printf("\nP%d\t\t| %d\t\t| %d\t\t| %d\t\t| %d\t\t\t| %d\t\t\t| %d\t\t| %d\t\t\t", p[i], priority[i], arrivalTime[i], burstTimeFinal[i], completionTime[i], turnaaroundTime, waitingTime, responseTime[i]);
     }
 
-    printf("\n--------------------------------------------------------------------------------------------------------------------------------");
+    printf("\n------------------------------------------------------------------------------------------------------------------------------------------------");
     printf("\nAverage Turnaround Time: %.2f", avgTurnaaroundTime/n);
     printf("\nAverage Waiting Time: %.2f", avgWaitingTime/n);
+    printf("\nAverage Response Time: %.2f\n", avgResponseTime/n);
 
 }
 
 int main(){
 
-    int arr[][3] = {{0, 5, 3}, {1, 3, 1}, {2, 6, 4}, {3, 4, 2}, };
+    int arr[][3] = {{0, 5, 3}, {1, 3, 1}, {2, 6, 4}, {20, 4, 2},{21,3,9}};
     int n = sizeof(arr)/sizeof(arr[0]);
     int time_quantum = 2;
 
