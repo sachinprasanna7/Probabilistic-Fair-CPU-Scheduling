@@ -40,6 +40,7 @@
                             <th>Completion Time</th>
                             <th>Turnaround Time</th>
                             <th>Waiting Time</th>
+                            <th>Response Time</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -50,6 +51,7 @@
                             <td colspan="5"></td>
                             <td>Average Turnaround Time: <span id="avgTurnaroundTime"></span></td>
                             <td>Average Waiting Time: <span id="avgWaitingTime"></span></td>
+                            <td>Average Response Time: <span id="avgResponseTime"></span></td>
                         </tr>
                     </tfoot>
                 </table>
@@ -118,9 +120,11 @@
             let burstTimeFinal = [];
             let completionTime = [];
             let priority = [];
+            let responseTime = [];
 
             let avgWaitingTime = 0;
             let avgTurnaaroundTime = 0;
+            let avgResponseTime = 0;
 
             let min = 100000;
             let ix = -1;
@@ -133,6 +137,7 @@
                 burstTime[i] = processes[i][1];
                 priority[i] = processes[i][2];
                 burstTimeFinal[i] = burstTime[i];
+                responseTime[i] = -1;
                 mpp.set(p[i], false);
 
                 if (min > arrivalTime[i]) {
@@ -153,6 +158,9 @@
             }
             let ganttChart = "";
             let processRunning = selectProcess(mpp, processes, processesInQueue, 2, n);
+
+            responseTime[processRunning] = ans;
+
             console.log("\nGantt Chart:\n\n");
 
             //make gantt chart to display it on the webpage, what element should i use?
@@ -211,6 +219,10 @@
 
                 processRunning = selectProcess(mpp, processes, processesInQueue, 2, n);
 
+                if(responseTime[processRunning] == -1) {
+                    responseTime[processRunning] = ans;
+                }
+
                 if (processRunning == -1 && j < n) {
                     let min = Number.MAX_SAFE_INTEGER;
                     let ix = -1;
@@ -234,6 +246,8 @@
                     ans = min;
 
                     processRunning = selectProcess(mpp, processes, processesInQueue, 2, n);
+
+                    responseTime[processRunning] = ans;
                 }
             }
 
@@ -308,8 +322,10 @@
             for (let i = 0; i < n; i++) {
                 let turnaroundTime = completionTime[i] - arrivalTime[i];
                 let waitingTime = turnaroundTime - burstTimeFinal[i];
+                responseTime[i] = responseTime[i] - arrivalTime[i];
                 avgTurnaaroundTime += turnaroundTime;
                 avgWaitingTime += waitingTime;
+                avgResponseTime += responseTime[i];
 
                 let row = tableBody.insertRow();
                 row.innerHTML = `
@@ -320,14 +336,17 @@
       <td>${completionTime[i]}</td>
       <td>${turnaroundTime}</td>
       <td>${waitingTime}</td>
+      <td>${responseTime[i]}</td>
     `;
             }
 
             // Update the average turnaround time and average waiting time
             const avgTurnaroundTimeElem = document.getElementById("avgTurnaroundTime");
             const avgWaitingTimeElem = document.getElementById("avgWaitingTime");
+            const avgResponseTimeElem = document.getElementById("avgResponseTime");
             avgTurnaroundTimeElem.textContent = (avgTurnaaroundTime / n).toFixed(2);
             avgWaitingTimeElem.textContent = (avgWaitingTime / n).toFixed(2);
+            avgResponseTimeElem.textContent = (avgResponseTime / n).toFixed(2);
         }
 
 
