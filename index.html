@@ -163,18 +163,15 @@
 
             console.log("\nGantt Chart:\n\n");
 
-            //make gantt chart to display it on the webpage, what element should i use?
-
             ganttChart += "<h2 style=\"margin-top: 110px;\">Gantt Chart:</h2>";
-
-
 
             for (let j = 0; j < n;) {
 
                 console.log(ans + "---P" + p[processRunning] + "---");
-                //add it to gantt chart for displaying on webpage
                 //ganttChart += "<div class='gantt-chart-element' style='width: 20px;'>" + "P" + p[processRunning] + "</div>";
-                ganttChart += "<div class='gantt-chart-element'>" + ans + "---P" + p[processRunning] + "---" + "</div>";
+                ganttChart += "<div class='gantt-chart-element'>" +"<div class='gantt-chart-time'>" + ans +"</div>" + " P" + p[processRunning] + "  " + "</div>";
+
+
 
                 // ganttChart += "<div class='gantt-chart-element'>"
                 //     + "<div class='gantt-chart-time'>" + ans + "</div>" // start time
@@ -257,7 +254,7 @@
 
             console.log(ans);
             //add it to gantt chart
-            ganttChart += "<div class='gantt-chart-element'>" + ans + "</div>";
+            ganttChart += "<div class='gantt-chart-element'>" + "<div class='gantt-chart-time'>" + ans +"</div>" + "</div>";
 
             //display gantt chart on webpage
             document.getElementById("gantt-chart").innerHTML = ganttChart;

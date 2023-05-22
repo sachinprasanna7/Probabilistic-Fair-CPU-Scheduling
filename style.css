@@ -29,24 +29,6 @@ form {
     position: relative;
   }
   
-  /* .form-container form {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .form-container label {
-    margin-bottom: 0.5rem;
-  }
-  
-  .form-container input {
-    margin-bottom: 1rem;
-  }
-  
-  .output-container {
-    margin-top: 2rem;
-  } */
-
 form label {
     display: block;
     margin-bottom: 0.5em;
@@ -102,51 +84,34 @@ tr:nth-child(even) {
 }
 
 #gantt-chart {
-    /* display: flex;
-    justify-content: center;
-    margin-top: 20px;
-    height: 50px; */
+    margin-top: 120px;
+    margin-bottom: 120px;
     display: inline-block;
-    position: absolute;
+    position: relative;
     left: 50%;
+    right: 50%;
     transform: translate(-50%, -50%);
+    
 }
 
 .gantt-chart-element{
     display: inline;
     text-align: center;
-}
-
-.gantt-chart-time {
-    text-align: center;
-    font-size: smaller;
-  }
-  
-  .gantt-chart-box {
-    display: inline-block;
     border: 1px solid black;
-    padding: 2px;
-    margin: 2px;
-  }
+    background-color: white;
+    color: black;
+}
+
+.gantt-chart-time{
+    display: inline;
+    text-align: center;
+    border: 1px solid black;
+    background-color: #0077cc;
+    color: white;
+}
+
+
   
 
-#output{
-    margin-top: 50px;
-}
 
-.task {
-    height: 100%;
-    position: absolute;
-}
 
-.task-1 {
-    background-color: #4CAF50;
-}
-
-.task-2 {
-    background-color: #f44336;
-}
-
-.task-3 {
-    background-color: #2196F3;
-}
