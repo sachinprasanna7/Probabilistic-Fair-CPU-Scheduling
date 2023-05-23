@@ -21,8 +21,8 @@
                 <input type="text" id="priority" placeholder="eg. 1,2,3" required>
                 <label>Time Quantum:</label>
                 <input type="text" id="time-quantum" placeholder="eg. 2" required>
-                <!-- <label>Adjustible Parameter (k):</label>
-                <input type="text" id="k" placeholder="eg. 1" required> -->
+                <label>Adjustible Parameter (k):</label>
+                <input type="text" id="k" placeholder="eg. 1" required>
                 <button type="button" onclick="submitData()">Submit</button>
             </form>
         </div>
@@ -110,7 +110,7 @@
             return probabilityVector[n - 1][0]; // Fallback option
         }
 
-        function probabilisticFair(processes, n, time_quantum) {
+        function probabilisticFair(processes, n, time_quantum, adjustibleParameter) {
 
             time_quantum = parseInt(time_quantum);
 
@@ -157,7 +157,7 @@
                 }
             }
             let ganttChart = "";
-            let processRunning = selectProcess(mpp, processes, processesInQueue, 2, n);
+            let processRunning = selectProcess(mpp, processes, processesInQueue, adjustibleParameter, n);
 
             responseTime[processRunning] = ans;
 
@@ -214,7 +214,7 @@
                     jj += 9;
                 }
 
-                processRunning = selectProcess(mpp, processes, processesInQueue, 2, n);
+                processRunning = selectProcess(mpp, processes, processesInQueue, adjustibleParameter, n);
 
                 if(responseTime[processRunning] == -1) {
                     responseTime[processRunning] = ans;
@@ -246,7 +246,7 @@
 
                     ans = min;
 
-                    processRunning = selectProcess(mpp, processes, processesInQueue, 2, n);
+                    processRunning = selectProcess(mpp, processes, processesInQueue, adjustibleParameter, n);
 
                     responseTime[processRunning] = ans;
                 }
@@ -307,8 +307,7 @@
             // avgWaitingTimeRow.innerHTML = `<td colspan="5"></td><td></td><td>${avgWaitingTimeText.textContent}</td>`;
             // tableBody.appendChild(avgWaitingTimeRow);
 
-            // Your existing code for generating result
-            // ...
+         
 
             // Access the table and its body
             const table = document.getElementById("table");
@@ -356,6 +355,7 @@
             var burstTime = document.getElementById("burst-time").value;
             var priority = document.getElementById("priority").value;
             var timeQuantum = document.getElementById("time-quantum").value;
+            var adjustibleParameter= document.getElementById("k").value;
             var arrivalTimeArray = arrivalTime.split(',');
             var burstTimeArray = burstTime.split(',');
             var priorityArray = priority.split(',');
@@ -386,14 +386,19 @@
             }
 
             timeQuantum = parseInt(timeQuantum);
+            adjustibleParameter = parseInt(adjustibleParameter);
 
             //if time quantum is 0 or negative
             if (timeQuantum <= 0) {
                 alert("Please enter a positive value for Time Quantum.");
                 return;
             }
+            if (adjustibleParameter < 0) {
+                alert("Please enter a positive value for Adjustible Parameter.");
+                return;
+            }
 
-            probabilisticFair(processes, processes.length, timeQuantum);
+            probabilisticFair(processes, processes.length, timeQuantum, adjustibleParameter);
 
         }
     </script>
