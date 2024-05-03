@@ -189,8 +189,7 @@ void probabilisticFair(int processes[][3], int n, int time_quantum){
     printf("\nAverage Turnaround Time: %.2f", avgTurnaaroundTime/n);
     printf("\nAverage Waiting Time: %.2f", avgWaitingTime/n);
 
-}
-
+} 
 
 
 int main(){
@@ -199,31 +198,13 @@ int main(){
     int n = sizeof(arr)/sizeof(arr[0]);
     int time_quantum = 2;
 
-    //int arrRR[][2] = {{0,3}, {0,5}, {3,2}, {16, 4}};
+    //arrival time - 0th index, burst time - 1st index, priority - 2nd index
 
     probabilisticFair(arr, n, time_quantum);
     cout<<endl;
-    probabilisticFair(arr, n, time_quantum);
-    cout<<endl;
-    probabilisticFair(arr, n, time_quantum);
-    cout<<endl;
-    probabilisticFair(arr, n, time_quantum);
-    cout<<endl;
-    probabilisticFair(arr, n, time_quantum);
-    cout<<endl;
-    probabilisticFair(arr, n, time_quantum);
-    cout<<endl;
-    probabilisticFair(arr, n, time_quantum);
-    cout<<endl;
-    probabilisticFair(arr, n, time_quantum);
-    cout<<endl;
-    probabilisticFair(arr, n, time_quantum);
-    cout<<endl;
-    probabilisticFair(arr, n, time_quantum);
-
-    //RR(arrRR, n, time_quantum);
 
 }
+
 
 
 
