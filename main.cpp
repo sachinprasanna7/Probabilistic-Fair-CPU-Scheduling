@@ -614,6 +614,48 @@ Result higherPriorityFirst(int catTime, int burstTimeLens, int priorityLens, int
 
 }
 
+Result generateRandomProcesses(int catTime, int burstTimeLens, int priorityLens, int time_quantum, int timetoAverage, int k){
+
+    int arr[300][3];
+
+    srand(12345);
+
+    for(int i = 0 ; i < 300 ; i++){
+        arr[i][0] = rand() % catTime;
+        arr[i][1] =  (rand() % burstTimeLens) + 1;
+        arr[i][2] =  (rand() % priorityLens) + 1;
+    }
+
+    createDirectory("Generated Data");
+    createDirectory("Generated Data/Arrival Times");
+    createDirectory("Generated Data/Burst Times");
+    createDirectory("Generated Data/Priority");
+
+    ofstream arrivalFile("Generated Data/Arrival Times/arrivalTime_random.txt");
+    ofstream burstFile("Generated Data/Burst Times/burstTime_random.txt");
+    ofstream priorityFile("Generated Data/Priority/priority_random.txt");
+
+    if (arrivalFile.is_open() && burstFile.is_open() && priorityFile.is_open()) {
+        for (int i = 0; i < 300; i++) {
+            arrivalFile << arr[i][0] << " ";
+            burstFile << arr[i][1] << " ";
+            priorityFile << arr[i][2] << " ";
+        }
+        arrivalFile.close();
+        burstFile.close();
+        priorityFile.close();
+        //cout << "Array contents written to files" << endl;
+    }
+
+    else {
+        cout << "Unable to open one or more files." << endl;
+    }
+
+    printf("\n\n****Random Processes****\n");
+    return calculateResults(arr, 300, time_quantum, k, timetoAverage);
+
+}
+
 
 int main() {
 
@@ -636,6 +678,9 @@ int main() {
     Result res5 = mediumPriorityFirst(catTime, burstTimeLens, priorityLens, time_quantum, timetoAverage, k);
     Result res6 = higherPriorityFirst(catTime, burstTimeLens, priorityLens, time_quantum, timetoAverage, k);
 
+    //Random Cases
+    Result res7 = generateRandomProcesses(catTime, burstTimeLens, priorityLens, time_quantum, timetoAverage, k);
+
 
     cout << "\n\n****FINAL RESULTS****\n\n";
     cout << "Case\tAvg Waiting Time\tAvg Turnaround Time\tAvg Response Time\n";
@@ -646,6 +691,7 @@ int main() {
     cout << "4\t" << res4.avgWaitingTime << "\t\t\t" << res4.avgTurnaroundTime << "\t\t\t" << res4.avgResponseTime << endl;
     cout << "5\t" << res5.avgWaitingTime << "\t\t\t" << res5.avgTurnaroundTime << "\t\t\t" << res5.avgResponseTime << endl;
     cout << "6\t" << res6.avgWaitingTime << "\t\t\t" << res6.avgTurnaroundTime << "\t\t\t" << res6.avgResponseTime << endl;
+    cout << "7\t" << res7.avgWaitingTime << "\t\t\t" << res7.avgTurnaroundTime << "\t\t\t" << res7.avgResponseTime << endl;
     
     return 0;
 }
