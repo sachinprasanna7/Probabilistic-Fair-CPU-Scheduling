@@ -18,7 +18,7 @@ x_values = list(range(0, 101))
 # Plotting
 plt.figure(figsize=(10, 6))
 
-# Plot response times
+# Plot response timess
 plt.plot(x_values, response_times, label='Response Times')
 
 # Plot waiting times

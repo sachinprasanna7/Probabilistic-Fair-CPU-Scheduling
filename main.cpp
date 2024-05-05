@@ -71,6 +71,8 @@ struct Result {
     float avgResponseTime;
 };
 
+vector <int> waitingTimes;
+
 Result probabilisticFair(int processes[][3], int n, int time_quantum, int k = 2){
 
     int p[300], arrivalTime[300], burstTime[300], burstTimeFinal[300], completionTime[300], priority[300], responseTime[300];
@@ -198,6 +200,7 @@ Result probabilisticFair(int processes[][3], int n, int time_quantum, int k = 2)
     for (int i = 0; i < n; i++){
         int turnaaroundTime = completionTime[i] - arrivalTime[i];
         int waitingTime = turnaaroundTime - burstTimeFinal[i];
+        waitingTimes.push_back(waitingTime);
         responseTime[i] -= arrivalTime[i];
         avgTurnaaroundTime += turnaaroundTime;
         avgWaitingTime += waitingTime;
@@ -639,7 +642,7 @@ Result generateRandomProcesses(int catTime, int burstTimeLens, int priorityLens,
         for (int i = 0; i < 300; i++) {
             arrivalFile << arr[i][0] << " ";
             burstFile << arr[i][1] << " ";
-            priorityFile << arr[i][2] << " ";
+            priorityFile << (priorityLens - arr[i][2]) << " ";
         }
         arrivalFile.close();
         burstFile.close();
@@ -777,15 +780,38 @@ int main() {
 
     cout<<"\nPROBABILISTIC FAIR CPU SCHEDULING ALGORITHM RESULT SIMULATOR:\n\n";
     
-    int time_quantum = 10;
+    int time_quantum = 30;
     int catTime = 1000;
     int burstTimeLens = 100;
     int priorityLens = 50;
-    int timetoAverage = 5;
-    int k = 100;
+    int timetoAverage = 10;
+    int k = 2;
 
-    testVaryingTimeQuantum(100, catTime, burstTimeLens, priorityLens, timetoAverage, k);
-    testVaryingK(catTime, burstTimeLens, priorityLens, time_quantum, timetoAverage, k);
-    
+    // testVaryingTimeQuantum(100, catTime, burstTimeLens, priorityLens, timetoAverage, k);
+    // testVaryingK(catTime, burstTimeLens, priorityLens, time_quantum, timetoAverage, k);
+
+    Result r1 = generateRandomProcesses(catTime, burstTimeLens, priorityLens, time_quantum, timetoAverage, k);
+    cout << "Random Processes: " << r1.avgWaitingTime << ", " << r1.avgTurnaroundTime << ", " << r1.avgResponseTime << endl;
+
+    cout << waitingTimes.size() << endl;
+
+    //store the waiting times in a text file seperated by commas withou any spaces
+    createDirectory("Generated Data");
+    createDirectory("Generated Data/Gini Index");
+
+    ofstream waitingFile("Generated Data/Gini Index/pbf_waitingTimes.txt");
+
+    if (waitingFile.is_open()) {
+        for (int i = 0; i < waitingTimes.size(); i++) {
+            waitingFile << waitingTimes[i] << ",";
+        }
+        waitingFile.close();
+        cout << "Array contents written to files" << endl;
+    }
+
+    else {
+        cout << "Unable to open one or more files." << endl;
+    }
+
     return 0;
 }
