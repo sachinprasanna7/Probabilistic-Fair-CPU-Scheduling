@@ -262,16 +262,16 @@ Result calculateResults(int arr[][3], int n, int time_quantum, int k, int timeto
             avgResponseTime[i] = ans.avgResponseTime;
         }
 
-        printf("Average Waiting Time Array: ");
-        printArray(avgWaitingTime, timetoAverage);
-        printf("Average Turnaround Time Array: ");
-        printArray(avgTurnaroundTime, timetoAverage);
-        printf("Average Response Time Array: ");
-        printArray(avgResponseTime, timetoAverage);
+        // printf("Average Waiting Time Array: ");
+        // printArray(avgWaitingTime, timetoAverage);
+        // printf("Average Turnaround Time Array: ");
+        // printArray(avgTurnaroundTime, timetoAverage);
+        // printf("Average Response Time Array: ");
+        // printArray(avgResponseTime, timetoAverage);
 
-        printf("\nFinal Average Waiting Time: %.2f\n", sum(avgWaitingTime, timetoAverage)/(timetoAverage*1.0));
-        printf("Final Average Turnaround Time: %.2f\n", sum(avgTurnaroundTime, timetoAverage)/(timetoAverage*1.0));
-        printf("Final Average Response Time: %.2f\n", sum(avgResponseTime, timetoAverage)/(timetoAverage*1.0));
+        // printf("\nFinal Average Waiting Time: %.2f\n", sum(avgWaitingTime, timetoAverage)/(timetoAverage*1.0));
+        // printf("Final Average Turnaround Time: %.2f\n", sum(avgTurnaroundTime, timetoAverage)/(timetoAverage*1.0));
+        // printf("Final Average Response Time: %.2f\n", sum(avgResponseTime, timetoAverage)/(timetoAverage*1.0));
 
         Result res;
         res.avgWaitingTime = sum(avgWaitingTime, timetoAverage)/(timetoAverage*1.0);
@@ -618,7 +618,7 @@ Result generateRandomProcesses(int catTime, int burstTimeLens, int priorityLens,
 
     int arr[300][3];
 
-    srand(12345);
+    srand(21453);
 
     for(int i = 0 ; i < 300 ; i++){
         arr[i][0] = rand() % catTime;
@@ -651,22 +651,12 @@ Result generateRandomProcesses(int catTime, int burstTimeLens, int priorityLens,
         cout << "Unable to open one or more files." << endl;
     }
 
-    printf("\n\n****Random Processes****\n");
+    //printf("\n\n****Random Processes****\n");
     return calculateResults(arr, 300, time_quantum, k, timetoAverage);
 
 }
 
-
-int main() {
-
-    cout<<"\nPROBABILISTIC FAIR CPU SCHEDULING ALGORITHM RESULT SIMULATOR:\n\n";
-    
-    int time_quantum = 6;
-    int catTime = 1000;
-    int burstTimeLens = 10;
-    int priorityLens = 10;
-    int timetoAverage = 3;
-    int k = 2;
+void testCategories(int catTime, int burstTimeLens, int priorityLens, int time_quantum, int timetoAverage, int k){
 
     //First 3 testing cases
     Result res1 = shorterTimeProcessesFirst(catTime, burstTimeLens, priorityLens, time_quantum, timetoAverage, k);
@@ -692,6 +682,110 @@ int main() {
     cout << "5\t" << res5.avgWaitingTime << "\t\t\t" << res5.avgTurnaroundTime << "\t\t\t" << res5.avgResponseTime << endl;
     cout << "6\t" << res6.avgWaitingTime << "\t\t\t" << res6.avgTurnaroundTime << "\t\t\t" << res6.avgResponseTime << endl;
     cout << "7\t" << res7.avgWaitingTime << "\t\t\t" << res7.avgTurnaroundTime << "\t\t\t" << res7.avgResponseTime << endl;
+
+}
+
+
+void testVaryingTimeQuantum(int maxTimeQuantum, int catTime, int burstTimeLens, int priorityLens, int timetoAverage, int k){
+
+    vector <float> turnAroundTimes;
+    vector <float> waitingTimes;
+    vector <float> responseTimes;
+    
+    for(int i = 1 ; i <= maxTimeQuantum; i++){
+
+        cout << "Time Quantum: " << i << endl;
+        Result res = generateRandomProcesses(catTime, burstTimeLens, priorityLens, i, timetoAverage, k);
+        turnAroundTimes.push_back(res.avgTurnaroundTime);
+        waitingTimes.push_back(res.avgWaitingTime);
+        responseTimes.push_back(res.avgResponseTime);
+    }
+
+    // write each of it to 3 text files,
+     createDirectory("Generated Data");
+        createDirectory("Generated Data/Turnaround Times");
+        createDirectory("Generated Data/Waiting Times");
+        createDirectory("Generated Data/Response Times");
+
+        ofstream arrivalFile("Generated Data/Turnaround Times/turnaroundTimes.txt");
+        ofstream burstFile("Generated Data/Waiting Times/waitingTimes.txt");
+        ofstream priorityFile("Generated Data/Response TImes/responseTimes.txt");
+
+        if (arrivalFile.is_open() && burstFile.is_open() && priorityFile.is_open()) {
+            for (int i = 0; i < turnAroundTimes.size(); i++) {
+                arrivalFile << turnAroundTimes[i] << ", ";
+                burstFile << waitingTimes[i] << ", ";
+                priorityFile << responseTimes[i] << ", ";
+            }
+            arrivalFile.close();
+            burstFile.close();
+            priorityFile.close();
+            //cout << "Array contents written to files" << endl;
+        }
+
+        else {
+            cout << "Unable to open one or more files." << endl;
+        }
+
+}
+
+void testVaryingK(int catTime, int burstTimeLens, int priorityLens, int time_quantum, int timetoAverage, int maxK){
+
+    vector <float> turnAroundTimes;
+    vector <float> waitingTimes;
+    vector <float> responseTimes;
+    
+    for(int i = 0 ; i <= maxK; i++){
+
+        cout << "K: " << i << endl;
+        Result res = generateRandomProcesses(catTime, burstTimeLens, priorityLens, time_quantum, timetoAverage, i);
+        turnAroundTimes.push_back(res.avgTurnaroundTime);
+        waitingTimes.push_back(res.avgWaitingTime);
+        responseTimes.push_back(res.avgResponseTime);
+    }
+
+    // write each of it to 3 text files,
+     createDirectory("Generated Data");
+        createDirectory("Generated Data/Turnaround Times");
+        createDirectory("Generated Data/Waiting Times");
+        createDirectory("Generated Data/Response Times");
+
+        ofstream arrivalFile("Generated Data/Turnaround Times/turnaroundTimes_k.txt");
+        ofstream burstFile("Generated Data/Waiting Times/waitingTimes_k.txt");
+        ofstream priorityFile("Generated Data/Response TImes/responseTimes_k.txt");
+
+        if (arrivalFile.is_open() && burstFile.is_open() && priorityFile.is_open()) {
+            for (int i = 0; i < turnAroundTimes.size(); i++) {
+                arrivalFile << turnAroundTimes[i] << ", ";
+                burstFile << waitingTimes[i] << ", ";
+                priorityFile << responseTimes[i] << ", ";
+            }
+            arrivalFile.close();
+            burstFile.close();
+            priorityFile.close();
+            //cout << "Array contents written to files" << endl;
+        }
+
+        else {
+            cout << "Unable to open one or more files." << endl;
+        }
+
+}
+
+
+int main() {
+
+    cout<<"\nPROBABILISTIC FAIR CPU SCHEDULING ALGORITHM RESULT SIMULATOR:\n\n";
+    
+    int time_quantum = 10;
+    int catTime = 1000;
+    int burstTimeLens = 100;
+    int priorityLens = 50;
+    int timetoAverage = 5;
+    int k = 100;
+
+    testVaryingTimeQuantum(100, catTime, burstTimeLens, priorityLens, timetoAverage, k);
+    testVaryingK(catTime, burstTimeLens, priorityLens, time_quantum, timetoAverage, k);
     
     return 0;
 }
