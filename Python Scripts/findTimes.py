@@ -13,7 +13,7 @@ def extract_waiting_times(filename):
         print(f"Error: File '{filename}' not found.")
     return waiting_times
 
-directory = 'Generated Data/Gini Index'
+directory = '..Generated Data/Gini Index'
 
 waitingTimeFCFS = extract_waiting_times(os.path.join(directory, 'fcfs.txt'))
 waitingTimeSJF = extract_waiting_times(os.path.join(directory, 'sjf.txt'))
